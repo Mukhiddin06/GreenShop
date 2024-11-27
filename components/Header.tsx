@@ -9,11 +9,14 @@ import Modal from './Modal'
 import LoginInputs from './LoginInputs'
 import RegisterInputs from './RegisterInputs'
 import { useAxios } from '@/hooks/useAxios'
+import VerifyRegister from './VerifyRegister'
 
 const Header = () => {
     const path = usePathname()
     const [loginModal, setLoginModal] = useState<boolean>(false)
-    const [isLogin , setIsLogin] = useState<"login" | "register">("login")
+    const [isLogin , setIsLogin] = useState<"login" | "register" | "verifyRegister">("login")
+    const [registerVerifyValue, setRegisterVerifyValue] = useState<string>("")
+    const [registerEmail, setRegisterEmail] = useState<string>("")
 
     function handleClickBtn():void {
       setLoginModal(true)
@@ -30,7 +33,8 @@ const Header = () => {
           console.log(res)
         })
       }
-      else{
+      else if(isLogin == "register"){
+        setRegisterEmail((e.target as HTMLFormElement).email.value)
         const data = {
           email:(e.target as HTMLFormElement).email.value,
           firstName:(e.target as HTMLFormElement).username.value,
@@ -38,6 +42,19 @@ const Header = () => {
           password:(e.target as HTMLFormElement).password.value
         }
         useAxios().post("/register", data).then(res => {
+          if(res){
+            setIsLogin("verifyRegister")
+          }
+        })
+      }
+      else if(isLogin == "verifyRegister"){
+        const data = {
+          email:registerEmail,
+          code:registerVerifyValue
+        }
+        useAxios().post("/users/verify", {}, {
+          params:data
+        }).then(res => {
           console.log(res)
         })
       }
@@ -62,8 +79,10 @@ const Header = () => {
                 <li onClick={() => setIsLogin("register")} className={`${isLogin == "register" ? "text-[#46A358]" : ""} `}>Register</li>
               </ul>
               <form onSubmit={handleSubmit} className='w-[300px] mx-auto' autoComplete='off'>
-                {isLogin == "login" ? <LoginInputs/> : <RegisterInputs/>}
-                <Button extraStyle='w-full text-[18px] font-bold py-[14px]' onClick={() => {}} type='submit' title='Login'/>
+                {isLogin == "login" && <LoginInputs/>}
+                {isLogin == "register" && <RegisterInputs/>}
+                {isLogin == "verifyRegister" && <VerifyRegister setRegisterVerifyValue={setRegisterVerifyValue}/>}
+                <Button extraStyle='w-full text-[18px] font-bold py-[14px]' onClick={() => {}} type='submit' title={`${isLogin == "login" ? "Login" : "Register"}`} />
               </form>
           </Modal>
         </div>
