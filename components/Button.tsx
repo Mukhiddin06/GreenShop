@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react'
 interface ButtonType {
     type: "button" | "submit"| "reset",
     extraStyle?: string,
-    onClick: () => void,
+    onClick?: () => void,
     title:string,
     leftIcon?:ReactNode,
     rightIcon?:ReactNode,
