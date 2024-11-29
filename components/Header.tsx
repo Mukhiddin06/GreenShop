@@ -10,13 +10,16 @@ import LoginInputs from './LoginInputs'
 import RegisterInputs from './RegisterInputs'
 import { useAxios } from '@/hooks/useAxios'
 import VerifyRegister from './VerifyRegister'
+import ForgotPassword from './ForgotPassword'
+import ResetPassword from './ResetPassword'
 
 const Header = () => {
     const path = usePathname()
     const [loginModal, setLoginModal] = useState<boolean>(false)
-    const [isLogin , setIsLogin] = useState<"login" | "register" | "verifyRegister">("login")
+    const [isLogin , setIsLogin] = useState<"login" | "register" | "verifyRegister" | "forgotPassword" | "resetPassword">("login")
     const [registerVerifyValue, setRegisterVerifyValue] = useState<string>("")
     const [registerEmail, setRegisterEmail] = useState<string>("")
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     function handleClickBtn():void {
       setLoginModal(true)
@@ -29,8 +32,14 @@ const Header = () => {
           usernameoremail:(e.target as HTMLFormElement).email.value,
           password:(e.target as HTMLFormElement).password.value
         }
+        setIsLoading(true)
         useAxios().post("/login", data).then(res => {
-          console.log(res)
+          localStorage.setItem("user", JSON.stringify(res.data))
+          setLoginModal(false)
+          setIsLoading(false)
+        }).catch(error => {
+          setIsLoading(false)
+          console.log(error)
         })
       }
       else if(isLogin == "register"){
@@ -41,9 +50,11 @@ const Header = () => {
           lastName:(e.target as HTMLFormElement).username.value,
           password:(e.target as HTMLFormElement).password.value
         }
+        setIsLoading(true)
         useAxios().post("/register", data).then(res => {
           if(res){
             setIsLogin("verifyRegister")
+            setIsLoading(false)
           }
         })
       }
@@ -52,12 +63,45 @@ const Header = () => {
           email:registerEmail,
           code:registerVerifyValue
         }
+        setIsLoading(true)
         useAxios().post("/users/verify", {}, {
           params:data
         }).then(res => {
-          console.log(res)
+          if(res){
+            setIsLogin("login")
+            setIsLoading(false)
+          }
+        }).catch(error => {
+          setIsLoading(false)
+          console.log(error)
         })
       }
+      else if(isLogin == "forgotPassword"){
+        setIsLoading(true)
+        useAxios().post(`/forgot/${(e.target as HTMLFormElement).email.value}`).then(res => {
+          if(res){
+            setIsLogin("resetPassword")
+            setIsLoading(false)
+          }
+        })
+      }
+      else if(isLogin == "resetPassword"){
+        const data = {
+          email:registerEmail,
+          new_password:(e.target as HTMLFormElement).newPassword.value,
+          otp:(e.target as HTMLFormElement).otp.value
+        }
+        console.log(data)
+        setIsLoading(true)
+        useAxios().put("/reset-password", data).then(res => {
+          if(res){
+            setIsLogin("login")
+            console.log(res)
+            setIsLoading(false)
+          }
+        })
+      }
+      (e.target as HTMLFormElement).reset();
     }
 
   return (
@@ -79,10 +123,12 @@ const Header = () => {
                 <li onClick={() => setIsLogin("register")} className={`${isLogin == "register" ? "text-[#46A358]" : ""} `}>Register</li>
               </ul>
               <form onSubmit={handleSubmit} className='w-[300px] mx-auto' autoComplete='off'>
-                {isLogin == "login" && <LoginInputs/>}
+                {isLogin == "login" && <LoginInputs setIsLogin={setIsLogin}/>}
                 {isLogin == "register" && <RegisterInputs/>}
                 {isLogin == "verifyRegister" && <VerifyRegister setRegisterVerifyValue={setRegisterVerifyValue}/>}
-                <Button extraStyle='w-full text-[18px] font-bold py-[14px]' onClick={() => {}} type='submit' title={`${isLogin == "login" ? "Login" : "Register"}`} />
+                {isLogin == "forgotPassword" && <ForgotPassword/>}
+                {isLogin == "resetPassword" && <ResetPassword/>}
+                <Button extraStyle='w-full text-[18px] font-bold py-[14px]' onClick={() => {}} type='submit' title={isLoading ? "" : `${isLogin == "login" ? "Login" : "Register"}`} leftIcon={isLoading ? <span className="loader"></span> : ""} />
               </form>
           </Modal>
         </div>

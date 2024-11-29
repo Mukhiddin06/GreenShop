@@ -18,7 +18,7 @@ const Modal:React.FC<ModalType> = ({openModal, setOpenModal, children, modalStyl
 
 
   return (
-    <div onClick={handleClose}  id='wrapper' className={`fixed flex inset-0 items-center duration-300 justify-center bg-[#000]/30 ${openModal ? "" : "scale-0"}`}>
+    <div onClick={handleClose}  id='wrapper' className={`fixed flex z-10 inset-0 items-center duration-300 justify-center bg-[#000]/30 ${openModal ? "" : "scale-0"}`}>
         <div className={`${modalStyle} w-[578px] mx-auto bg-white pt-[50px] pb-[68px] relative border-b-[10px] border-b-[#46A358]`}>
             <button className='absolute top-[14px] right-[15px]' onClick={() => setOpenModal(false)}><CloseIcon/></button>
             {children}

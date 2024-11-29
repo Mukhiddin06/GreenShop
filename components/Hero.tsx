@@ -12,8 +12,8 @@ const Hero = () => {
         <Button extraStyle="w-[140px] py-[11px] text-[16px] font-bold" title="SHOP NOW" type="button"/>
       </div>
       <div className="relative h-[450px] w-[450px]">
-        <Image style={{width:"450px", height:"450px"}} priority  alt='Flower' src={"/Flower.png"} width={450} height={450}/>
-        <Image  className="absolute bottom-[29px] left-[30px] z-10" style={{width:"135px", height:"135px"}} priority  alt='Flower' src={"/Flower.png"} width={135} height={135}/>
+        <Image priority style={{width:"450px", height:"450px"}} alt='Flower' src={"/Flower.png"} width={450} height={450}/>
+        <Image priority className="absolute bottom-[29px] left-[30px] z-10" style={{width:"135px", height:"135px"}} alt='Flower' src={"/Flower.png"} width={135} height={135}/>
       </div>
     </div>
   )
