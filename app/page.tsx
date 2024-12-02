@@ -13,6 +13,7 @@ interface TagTypes {
 export default function Home() {
   const {setTags} = useContext(Context)
   const [isActive, setIsActive] = useState("")
+  const [sortBy, setSortBy] = useState("Default sorting");
 
   const tags: TagTypes[] = [
     {
@@ -46,12 +47,13 @@ export default function Home() {
             <ul className="flex space-x-[37px]">{tags.map((item: TagTypes, index: number) => <li onClick={() => handleClickAll(item.tagName, item.path)} className={`text-[#3D3D3D] text-[15px] leading-[16px] ${isActive == item.tagName ? "tag-name text-[#46A358] font-bold" : ""}`} key={index}>{item.tagName}</li>)}</ul>
             <div className="flex items-center space-x-[8px]">
               <p>Short by:</p>
-            <select className="">
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="outline-none">
               <option value="Default sorting">Default sorting</option>
+              <option value="Price">Price</option>
             </select>
             </div>
           </div>
-          <Products />
+          <Products sortBy={sortBy}/>
         </div>
       </div>
     </>

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     domains: ['3.125.43.204'], 
+    unoptimized: true,
   },
 };
 
