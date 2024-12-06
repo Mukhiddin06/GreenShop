@@ -28,14 +28,16 @@ interface ProductsProps {
 }
 
 const Products: React.FC<ProductsProps> = ({ sortBy }) => {
+  const { token }:any = useContext(Context)
   const { category, tags, minPrice, maxPrice, size } = useContext(Context)
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  const { data: products = [], isLoading } = useQuery(({
-    queryKey: ['products', category, tags, minPrice, maxPrice, size, currentPage],
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products', category, tags, minPrice, maxPrice, size, currentPage, token],
     queryFn: () => useAxios().get("/products", {
+      headers:token ? {Authorization:`Bearer ${token.access_token}`} : {},
       params: {
         page: currentPage,
         limit: itemsPerPage,
@@ -46,7 +48,7 @@ const Products: React.FC<ProductsProps> = ({ sortBy }) => {
         min_price: minPrice
       }
     }).then(res => res.data.products ? res.data.products : [])
-  }))
+  })
 
   const allProducts = useMemo(() => {
     if (sortBy === "Price") {
@@ -59,7 +61,6 @@ const Products: React.FC<ProductsProps> = ({ sortBy }) => {
     setCurrentPage(page);
   }
 
-
   return (
     <>
       <div className='flex flex-wrap gap-[37px]'>
@@ -69,7 +70,7 @@ const Products: React.FC<ProductsProps> = ({ sortBy }) => {
         <Pagination 
           current={currentPage}
           pageSize={itemsPerPage}
-          total={50}
+          total={18}
           onChange={handlePageChange}/>
       </div>
     </>

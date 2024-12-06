@@ -2,8 +2,8 @@
 import { LogoutIcon, SaveIcon, SearchIcon } from '@/public/images/Icons'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React, { useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import React, { useContext, useState } from 'react'
 import Button from './Button'
 import Modal from './Modal'
 import LoginInputs from './LoginInputs'
@@ -12,14 +12,19 @@ import { useAxios } from '@/hooks/useAxios'
 import VerifyRegister from './VerifyRegister'
 import ForgotPassword from './ForgotPassword'
 import ResetPassword from './ResetPassword'
+import { Context } from '@/context/Context'
+import { useQuery } from '@tanstack/react-query'
 
 const Header = () => {
     const path = usePathname()
+    const {setToken, token} = useContext(Context)
     const [loginModal, setLoginModal] = useState<boolean>(false)
     const [isLogin , setIsLogin] = useState<"login" | "register" | "verifyRegister" | "forgotPassword" | "resetPassword">("login")
     const [registerVerifyValue, setRegisterVerifyValue] = useState<string>("")
     const [registerEmail, setRegisterEmail] = useState<string>("")
     const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    const router = useRouter()
 
     function handleClickBtn():void {
       setLoginModal(true)
@@ -34,7 +39,7 @@ const Header = () => {
         }
         setIsLoading(true)
         useAxios().post("/login", data).then(res => {
-          localStorage.setItem("user", JSON.stringify(res.data))
+          setToken(res.data)
           setLoginModal(false)
           setIsLoading(false)
         }).catch(error => {
@@ -56,6 +61,9 @@ const Header = () => {
             setIsLogin("verifyRegister")
             setIsLoading(false)
           }
+        }).catch(error => {
+          setIsLoading(false)
+          console.log(error)
         })
       }
       else if(isLogin == "verifyRegister"){
@@ -83,6 +91,9 @@ const Header = () => {
             setIsLogin("resetPassword")
             setIsLoading(false)
           }
+        }).catch(error => {
+          setIsLoading(false)
+          console.log(error)
         })
       }
       else if(isLogin == "resetPassword"){
@@ -99,23 +110,37 @@ const Header = () => {
             console.log(res)
             setIsLoading(false)
           }
+        }).catch(error => {
+          setIsLoading(false)
+          console.log(error)
         })
       }
       (e.target as HTMLFormElement).reset();
     }
 
+    const { data: basketProducts = {}} = useQuery({
+      queryKey: ['basketProducts'],
+      queryFn: () => useAxios().get("/basket", {
+        headers:token ? {Authorization:`Bearer ${token.access_token}`} : {},
+        params: { page: 1, limit: 100 }
+      }).then(res => res.data ? res.data : {})
+    })
+
   return (
-    <header className='flex items-center justify-between w-[1200px] mx-auto pt-[26px] pb-[18px] border-b-[1px] border-b-[#46A35880]'>
+    <header className='flex items-center justify-between max-w-[1200px] mx-auto pt-[26px] pb-[18px] border-b-[1px] border-b-[#46A35880]'>
         <Image style={{width:"150px", height:"34px"}} priority  alt='Logo' src={"/Logo.svg"} width={150} height={34}/>
         <nav className='flex items-center space-x-[50px]'>
             <Link className={`${path == "/" ? "home_link font-bold" : ""} text-[16px] leading-[20px] text-[#3D3D3D]`} href={"/"}>Home</Link>
-            <Link className={`${path == "/shop" ? "home_link font-bold" : ""} text-[16px] leading-[20px] text-[#3D3D3D]`} href={"/shop"}>Shop</Link>
+            <Link className={`${path.includes("shop") ? "home_link font-bold" : ""} text-[16px] leading-[20px] text-[#3D3D3D]`} href={"/shop"}>Shop</Link>
             <Link className={`${path == "/plant-care" ? "home_link font-bold" : ""} text-[16px] leading-[20px] text-[#3D3D3D]`} href={"/plant-care"}>Plant Care</Link>
             <Link className={`${path == "/blogs" ? "home_link font-bold" : ""} text-[16px] leading-[20px] text-[#3D3D3D]`} href={"/blogs"}>Blogs</Link>
         </nav>
         <div className='flex justify-between gap-[30px]'>
           <button><SearchIcon/></button>
-          <button><SaveIcon/></button>
+          <button onClick={() => router.push("/shop/shopping-card")} className='relative'>
+            <span className='w-[14px] h-[14px] border-[1px] border-white text-[9px] rounded-full bg-[#46A358] text-white absolute'>{basketProducts.TotalCount}</span>
+            <SaveIcon/>
+          </button>
           <Button extraStyle='gap-[5px] w-[100px] font-semibold' leftIcon={<LogoutIcon/>} onClick={handleClickBtn} type='button' title='Login' />
           <Modal openModal={loginModal} setOpenModal={setLoginModal}>
               <ul className='flex items-center justify-center gap-[10px] font-semibold text-[20px] leading-[16px] cursor-pointer'>

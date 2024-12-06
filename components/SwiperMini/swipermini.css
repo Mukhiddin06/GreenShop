@@ -1,0 +1,6 @@
+.swiper-pagination-bullet-active{
+    background-color: #46A358;
+  }
+.swipermini  .swiper-pagination{
+  position: static;
+}

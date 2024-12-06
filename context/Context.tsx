@@ -2,13 +2,13 @@
 import React, { createContext, ReactNode, SetStateAction, useEffect, useState } from "react";
 
 interface ContextType {
-    token:string | null,
+    token:any | null,
     category:string | null,
     tags:string | null,
     size:string | null,
     minPrice:number | null,
     maxPrice:number | null,
-    setToken:React.Dispatch<SetStateAction<string | null>>,
+    setToken:React.Dispatch<SetStateAction<any | null>>,
     setCategory:React.Dispatch<SetStateAction<string | null>>,
     setTags:React.Dispatch<SetStateAction<string | null>>,
     setSize:React.Dispatch<SetStateAction<string | null>>,
@@ -32,22 +32,21 @@ export const Context = createContext<ContextType>({
 });
 
 export const ContextProvider:React.FC<{children:ReactNode}> = ({children}) => {
-    const [token, setToken] = useState<string | null>(null);
+    let data:string | null = null
+
+    if(typeof window !== "undefined"){
+        data = localStorage.getItem("user")
+    }
+    const [token, setToken] = useState<any>(data ? JSON.parse(data) : null);
     const [category, setCategory] = useState<string | null>(null);
     const [tags, setTags] = useState<string | null>(null);
     const [size, setSize] = useState<string | null>(null);
     const [minPrice, setMinPrice] = useState<number | null>(null);
     const [maxPrice, setMaxPrice] = useState<number | null>(null);
 
-
-    useEffect(() => {
-        const savedUser = localStorage.getItem("user");
-        if (savedUser) {
-            setToken(JSON.parse(savedUser));
-        }
-    }, [])
-
-    // console.log(token)
+    if(typeof window !== "undefined"){
+        localStorage.setItem("user", JSON.stringify(token))
+    }
 
     return (
         <Context.Provider value={{token, setToken, category, setCategory, tags, setTags, size, setSize, maxPrice, minPrice, setMaxPrice, setMinPrice}}>{children}</Context.Provider>

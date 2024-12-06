@@ -75,6 +75,10 @@
     object-fit: cover;
   }
 
+  .swiper-pagination-bullet-active{
+    background-color: #46A358;
+  }
+
 
 
   .loader {
@@ -106,3 +110,24 @@
       100% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)}
   }
 
+  .range-slider-thumb {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background-color: #46A358; /* Yashil rang */
+      border-radius: 50%;
+      transform: translateX(-50%);
+      pointer-events: auto; /* Interaktiv qilish uchun */
+      z-index: 3;
+  }
+  
+  .range-slider-bar {
+      position: absolute;
+      height: 8px;
+      background-color: #46A358; /* Yashil diapazon */
+      border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar{
+    display: none;
+  }

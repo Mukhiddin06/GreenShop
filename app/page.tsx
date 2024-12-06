@@ -1,4 +1,7 @@
 "use client"
+import BlogPost from "@/components/BlogPosts/BlogPost";
+import FindMore from "@/components/FindMore/FindMore";
+import Footer from "@/components/Footer/Footer";
 import SwiperDemo from "@/components/Swiper";
 import { Context } from "@/context/Context";
 import Categories from "@/services/Categories";
@@ -56,6 +59,13 @@ export default function Home() {
           <Products sortBy={sortBy}/>
         </div>
       </div>
+      <div>
+        <FindMore/>
+      </div>
+      <div className="mb-[100px]">
+        <BlogPost/>
+      </div>
+      <footer><Footer/></footer>
     </>
   );
 }
